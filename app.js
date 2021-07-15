@@ -222,7 +222,9 @@ const UICtrl = (function(){
         clearBtn:'.clear-btn',
         itemNameInput: '#item-name',
         itemCaloriesInput: '#item-calories',
-        totalCals: '.total-calories'
+        totalCals: '.total-calories',
+        nameInputErr:'.name-input-error',
+        calInputErr:'.calorie-input-error'
     } 
     //public Methods
     return {
@@ -318,6 +320,23 @@ const UICtrl = (function(){
             document.querySelector(UISelectors.backBtn).style.display='inline';
         },
 
+        showError: function(place){
+            if(place==='name'){
+                document.querySelector(UISelectors.itemNameInput).style.borderColor='red';
+                document.querySelector(UISelectors.nameInputErr).style.display='inline';
+            }
+            else if(place==='cals'){
+                document.querySelector(UISelectors.itemCaloriesInput).style.borderColor='red';
+                document.querySelector(UISelectors.calInputErr).style.display='inline';
+            }
+            else{
+                document.querySelector(UISelectors.itemNameInput).style.borderColor='red';
+                document.querySelector(UISelectors.itemCaloriesInput).style.borderColor='red';
+                document.querySelector(UISelectors.nameInputErr).style.display='inline';
+                document.querySelector(UISelectors.calInputErr).style.display='inline';
+            }
+        },
+
         hideList: function(){
             document.querySelector(UISelectors.itemList).style.display='none';
         },
@@ -329,6 +348,10 @@ const UICtrl = (function(){
             document.querySelector(UISelectors.backBtn).style.display='none';
         },
 
+        hideInputErrors: function(){
+            document.querySelector(UISelectors.calInputErr).style.display='none';
+            document.querySelector(UISelectors.nameInputErr).style.display='none';
+        },
         clearUI : function(){
 
             let listItems=  document.querySelectorAll(UISelectors.listItems);
@@ -356,6 +379,18 @@ const App = (function(ItemCtrl,UICtrl,StorageCtrl){
 
         //Add item Event
         document.querySelector(UISelectors.addBtn).addEventListener('click',itemAddSubmit);
+
+        //hide input error on adding value to it
+        document.querySelector(UISelectors.itemNameInput).addEventListener('keyup',function(e){
+            UICtrl.hideInputErrors();
+            document.querySelector(UISelectors.itemNameInput).style.borderColor='grey';
+            document.querySelector(UISelectors.itemCaloriesInput).style.borderColor='grey';
+        });
+        document.querySelector(UISelectors.itemCaloriesInput).addEventListener('keyup',function(e){
+            UICtrl.hideInputErrors();
+            document.querySelector(UISelectors.itemNameInput).style.borderColor='grey';
+            document.querySelector(UISelectors.itemCaloriesInput).style.borderColor='grey';
+        });
 
         //Disable submit on enter
         document.addEventListener('keypress',function(e){
@@ -392,7 +427,17 @@ const App = (function(ItemCtrl,UICtrl,StorageCtrl){
         
         //Validate Input
         if(input.name==='' || input.calories ===''){
-            console.log('Error');
+            let place;
+            if(input.name==='' && input.calories ===''){
+                place='both';
+            }
+            else if(input.name===''){
+                place='name';
+            }
+            else{
+                place='cals';
+            }
+            UICtrl.showError(place);
         }
         else{
             //Add Item
@@ -540,6 +585,9 @@ const App = (function(ItemCtrl,UICtrl,StorageCtrl){
 
             //hide edit buttons
             UICtrl.hideEditButtons();
+
+            //hide input errors
+            UICtrl.hideInputErrors();
             
             //check if any items are there
             if(Items.length===0){

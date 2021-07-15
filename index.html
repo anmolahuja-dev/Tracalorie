@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .name-input-error,.calorie-input-error{
+            color: red;
+        }
+    </style>
     <title>Tracalorie | Meal & Calorie Tracker</title>
 </head>
 <body>
@@ -37,11 +42,14 @@
                         <div class="input-field col s6">
                             <input type="text" id="item-name" placeholder="Add Item">
                             <label for="item-name">Meal</label>
+                            <div class="name-input-error">Please provide a meal name</div>
                         </div>
                         <div class="input-field col s6">
                             <input type="number" id="item-calories" placeholder="Add Calories">
                             <label for="item-calories">Calories</label>
+                            <div class="calorie-input-error">Please provide calorie value</div>
                         </div>
+                        <div class="col s12">
                         <button class="add-btn btn blue darken-3"><i class="fa fa-plus"></i> Add Meal</button>
 
                         <button class="update-btn btn orange "><i class="fa fa-pencil-square-o"></i> Update Meal</button>
@@ -49,6 +57,7 @@
                         <button class="delete-btn btn red"><i class="fa fa-remove"></i> Delete Meal</button>
 
                         <button class="back-btn btn grey darken-2 right"><i class="fa fa-chevron-circle-left"></i> Back</button>
+                        </div>
                     </div>
                 </div>
             </div>
