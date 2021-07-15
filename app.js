@@ -1,4 +1,99 @@
 //Storage Controller
+const StorageCtrl=(function(){
+    //PUblic Methods
+    return{
+        storeItem: function(newItem){
+            let items;
+            if(localStorage.getItem('items')===null){
+                items=[];
+                //push new item
+                items.push(newItem);
+                //set local storage
+                localStorage.setItem('items',JSON.stringify(items));
+            }
+            else{
+                items=JSON.parse(localStorage.getItem('items'));
+
+                //push new item
+                items.push(newItem);
+
+                //set local storage
+                localStorage.setItem('items',JSON.stringify(items));
+            }
+
+            let totalCalories=0;
+            if(localStorage.getItem('totalCalories')===null){
+                totalCalories=newItem.calories;
+                localStorage.setItem('totalCalories',JSON.stringify(totalCalories));
+            }
+            else{
+                totalCalories=JSON.parse(localStorage.getItem('totalCalories'));
+                totalCalories+=newItem.calories;
+                localStorage.setItem('totalCalories',JSON.stringify(totalCalories));
+            }
+        },
+        getItemFromStorage: function(){
+            let items;
+            if(localStorage.getItem('items')===null){
+                items=[];
+            }
+            else{
+                items=JSON.parse(localStorage.getItem('items'));
+            }
+            return items;
+        },
+        getTotalCaloriesFromStorage: function(){
+            let totalCalories;
+            if(localStorage.getItem('totalCalories')===null){
+                totalCalories=0;
+            }
+            else{
+                totalCalories=JSON.parse(localStorage.getItem('totalCalories'));
+            }
+            return totalCalories;
+        },
+
+        updateItemStorage: function(updatedItem){
+            let items =JSON.parse(localStorage.getItem('items'));
+            let totalCalories = JSON.parse(localStorage.getItem('totalCalories'));
+            items.forEach(function(item,index){
+                if(updatedItem.id===item.id){
+                    
+                    //update calories
+                    totalCalories-=item.calories;
+                    totalCalories+=updatedItem.calories;
+                    //update item (this is another variation of splice function)
+                    items.splice(index,1,updatedItem);
+                }
+            });
+            //reset local Storage
+            localStorage.setItem('items',JSON.stringify(items));
+            localStorage.setItem('totalCalories',JSON.stringify(totalCalories));
+        },
+
+        deleteItemFromStorage: function(id){
+            let items =JSON.parse(localStorage.getItem('items'));
+            let totalCalories = JSON.parse(localStorage.getItem('totalCalories'));
+            items.forEach(function(item,index){
+                if(id===item.id){
+                    //update calories
+                    totalCalories-=item.calories;
+                    
+                    //update item (this is another variation of splice function)
+                    items.splice(index,1);
+                    
+                }
+            });
+            //reset local Storage
+            localStorage.setItem('items',JSON.stringify(items));
+            localStorage.setItem('totalCalories',JSON.stringify(totalCalories));
+        },
+        clearItemsFromStorage: function(){
+            localStorage.removeItem('items');
+            localStorage.removeItem('totalCalories');
+        }
+    }
+})();
 
 //Item Controller
 const ItemCtrl = (function(){
@@ -12,9 +107,11 @@ const ItemCtrl = (function(){
 
     //Data Structure / State
     const data = {
-        items:[],
+        // items:[],
+        items:StorageCtrl.getItemFromStorage(),
         currentItem:null,
-        totalCalories:0
+        //totalCalories:0
+        totalCalories: StorageCtrl.getTotalCaloriesFromStorage()
     }
 
     //Public Methods
@@ -144,6 +241,8 @@ const UICtrl = (function(){
             });
 
             document.querySelector(UISelectors.itemList).innerHTML=html; //UISelector is used so that just in case if the id of UL is changed we can change it in object and the changes will be effective right away
+
+            document.querySelector(UISelectors.totalCals).textContent=ItemCtrl.getTotalCalories();
         },
 
         getItemInput: function(){
@@ -249,7 +348,7 @@ const UICtrl = (function(){
 })();
 
 //App Controller
-const App = (function(ItemCtrl,UICtrl){
+const App = (function(ItemCtrl,UICtrl,StorageCtrl){
     // Load Event Listeners
     const loadEventListeners = () => {
         //get ui selectors
@@ -308,6 +407,9 @@ const App = (function(ItemCtrl,UICtrl){
             //Update Total Calories
             UICtrl.updateTotalCalories(totalCalories);
 
+            //Store in local Storage
+            StorageCtrl.storeItem(newItem);
+
             //clear Fields
             UICtrl.clearFields();
         }
@@ -360,6 +462,9 @@ const App = (function(ItemCtrl,UICtrl){
         console.log(totalCalories);
         //Update Total Calories
         UICtrl.updateTotalCalories(totalCalories);
+
+        //Update local Storage
+        StorageCtrl.updateItemStorage(updatedItem);
         
         //clear input fields in ui
         UICtrl.clearFields();
@@ -386,6 +491,9 @@ const App = (function(ItemCtrl,UICtrl){
 
         //Update Total Calories
         UICtrl.updateTotalCalories(totalCalories);
+
+        //Delete from local storage
+        StorageCtrl.deleteItemFromStorage(currentItem.id);
         
         //clear input fields in ui
         UICtrl.clearFields();
@@ -409,6 +517,9 @@ const App = (function(ItemCtrl,UICtrl){
 
         //Update Total Calories
         UICtrl.updateTotalCalories(totalCalories);
+
+        //clear local storage
+        StorageCtrl.clearItemsFromStorage();
         
         //clear input fields in ui
         UICtrl.clearFields();
@@ -443,7 +554,7 @@ const App = (function(ItemCtrl,UICtrl){
             loadEventListeners();
         }
     }
-})(ItemCtrl,UICtrl);
+})(ItemCtrl,UICtrl,StorageCtrl);
 
 //Initializing APp
 App.init();
